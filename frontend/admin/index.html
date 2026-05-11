@@ -482,24 +482,33 @@ tr:hover td{background:rgba(79,142,247,0.04);}
 <div id="toast"></div>
 
 <script>
-const API  = 'https://hwaseong-api.onrender.com';
-const KEY  = 'hwaseong2026';
-const LS_KEY = 'admin_auth';
+const API    = 'https://hwaseong-api.onrender.com';
+const LS_KEY = 'admin_key';
+
+let _key = localStorage.getItem(LS_KEY) || '';
 
 // ─── AUTH ───
-function doLogin() {
-  const val = document.getElementById('pw-input').value;
-  if (val === KEY) {
-    localStorage.setItem(LS_KEY, '1');
+async function doLogin() {
+  const val = document.getElementById('pw-input').value.trim();
+  if (!val) return;
+  try {
+    const res = await fetch(API + '/api/notices', { headers: { 'x-admin-key': val } });
+    if (res.status === 401) {
+      alert('비밀번호가 올바르지 않습니다.');
+      document.getElementById('pw-input').value = '';
+      return;
+    }
+    _key = val;
+    localStorage.setItem(LS_KEY, val);
     showApp();
-  } else {
-    alert('비밀번호가 올바르지 않습니다.');
-    document.getElementById('pw-input').value = '';
+  } catch {
+    alert('서버에 연결할 수 없습니다.');
   }
 }
 
 function logout() {
   localStorage.removeItem(LS_KEY);
+  _key = '';
   location.reload();
 }
 
@@ -511,7 +520,7 @@ function showApp() {
 }
 
 // 자동 로그인
-if (localStorage.getItem(LS_KEY) === '1') showApp();
+if (_key) showApp();
 
 // ─── TOAST ───
 let _toastTimer;
@@ -537,7 +546,7 @@ function switchTab(name, btn) {
 async function apiFetch(path, method='GET', body=null) {
   const opts = {
     method,
-    headers: { 'Content-Type': 'application/json', 'x-admin-key': KEY },
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': _key },
   };
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(API + path, opts);
