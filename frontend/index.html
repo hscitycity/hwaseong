@@ -580,13 +580,13 @@ footer{
       <h1>데이터가 만드는 화성시의 미래<br><span class="gold">AI 정책</span>으로 함께 설계합니다</h1>
       <p class="hero-desc">화성시 AI·데이터 정책연구모임 7개 팀이 함께 연구합니다.<br>공지사항, 연구활동, 활동비 지원 정보를 확인하세요.</p>
       <div class="hero-groups">
-        <span class="hero-group-pill" onclick="goGroup('g1')">① 외.체.능</span>
-        <span class="hero-group-pill" onclick="goGroup('g2')">② 다해드림</span>
-        <span class="hero-group-pill" onclick="goGroup('g3')">③ 포레스트 링크</span>
-        <span class="hero-group-pill" onclick="goGroup('g4')">④ AI 데이터 풀버젼</span>
-        <span class="hero-group-pill" onclick="goGroup('g5')">⑤ 화성 넥서스</span>
-        <span class="hero-group-pill" onclick="goGroup('g6')">⑥ 경대생</span>
-        <span class="hero-group-pill" onclick="goGroup('g7')">⑦ BIOMASS</span>
+        <span class="hero-group-pill" onclick="goGroup(1)">① 외.체.능</span>
+        <span class="hero-group-pill" onclick="goGroup(2)">② 다해드림</span>
+        <span class="hero-group-pill" onclick="goGroup(3)">③ 포레스트 링크</span>
+        <span class="hero-group-pill" onclick="goGroup(4)">④ AI 데이터 풀버젼</span>
+        <span class="hero-group-pill" onclick="goGroup(5)">⑤ 화성 넥서스</span>
+        <span class="hero-group-pill" onclick="goGroup(6)">⑥ 경대생</span>
+        <span class="hero-group-pill" onclick="goGroup(7)">⑦ BIOMASS</span>
       </div>
     </div>
   </div>
@@ -913,115 +913,6 @@ function observeCards() {
 }
 
 // ═══════════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════════
-const STATIC_NOTICES = [
-  {
-    id:1, type:'important', date:'2026.05.08',
-    title:'메모보고 제출 안내 (필독)',
-    summary:'메모보고 제출 시 이동재 주사님께만 제출, 팀이름 명시 필수',
-    content:`<span class="highlight">✅ 메모보고는 <strong>AI스마트전략실 이동재</strong>에게만 제출해 주시기 바랍니다.</span>
-
-권희진 주사님은 자유주제 담당으로, 섞여서 취합 시 어려움이 있습니다.
-
-<span class="highlight">📌 메모보고 제목 형식</span>
-<strong>활동관리카드</strong>
-순번. AI정책연구모임 활동관리카드_모임명(00월)
-
-<strong>연구활동비 청구서</strong>
-순번. AI정책연구모임 연구활동비 청구서_모임명(00월)
-
-<strong>연구활동비 청구계좌</strong>
-순번. AI정책연구모임 연구활동비 청구계좌_모임명(00월)
-
-<strong>기타자료</strong>
-순번. AI정책연구모임 연구활동비 기타자료_모임명(00월)
-
-<span class="warn">💡 활동관리카드와 연구활동비 청구서는 스캔본으로 처리합니다. 결과보고서에만 집중해 주세요.</span>`
-  },
-  {
-    id:2, type:'important', date:'2026.05.08',
-    title:'모임별 순번 안내',
-    summary:'메모보고 제출 시 사용할 모임별 접수 순번입니다.',
-    content:`메모보고 제출 시 아래 <strong>순번을 제목 앞에 기재</strong>해 주시기 바랍니다.
-
-<span class="highlight">
-<strong>1번</strong> 외.체.능
-<strong>2번</strong> 다해드림
-<strong>3번</strong> 포레스트 링크
-<strong>4번</strong> AI 데이터 풀버젼
-<strong>5번</strong> 화성 넥서스
-<strong>6번</strong> 경대생
-<strong>7번</strong> BIOMASS
-</span>
-
-예시: <strong>1. AI정책연구모임 활동관리카드_외.체.능(05월)</strong>`
-  },
-  {
-    id:3, type:'new', date:'2026.05.08',
-    title:'활동관리카드 제출 기한 안내 (5월분)',
-    summary:'5월 활동관리카드 제출 기한은 6월 5일(목)까지입니다.',
-    content:`<span class="highlight">📅 5월 활동관리카드 제출 기한: <strong>2026년 6월 5일(목)까지</strong></span>
-
-<strong>제출 방법</strong>
-온나라 '메모보고'로 AI스마트전략실 이동재에게 제출
-
-<strong>제출 서류</strong>
-- 정책연구모임 활동관리카드 (스캔본)
-- 연구활동비 청구서 (해당 시)
-
-<span class="warn">⚠ 기한 초과 시 1일당 –1점 감점됩니다.</span>`
-  },
-  {
-    id:4, type:'new', date:'2026.05.08',
-    title:'결과보고서 제출 안내 (~9.11)',
-    summary:'최종 결과보고서 제출 기한: 2026년 9월 11일(금)',
-    content:`<span class="highlight">📅 결과보고서 제출 기한: <strong>2026년 9월 11일(금)까지</strong></span>
-
-<strong>제출 서류</strong>
-- 요약서 (1page)
-- 카드뉴스 서식 (1page)
-- 연구결과보고서 (30page 이상)
-
-<strong>제출 방법</strong>
-온나라 '메모보고' → AI스마트전략실 이동재
-
-<span class="warn">⚠ 아래 경우 1차 심사에서 탈락될 수 있습니다:
-- 결과보고서 분량이 현저히 부족한 경우
-- 보고자료 짜깁기, 표절, 재활용 등 불성실 연구
-- 구체적 해결·실행방안이 없는 단순 사례나열
-- 담당부서 및 소요예산이 미포함된 연구</span>`
-  },
-  {
-    id:5, type:'normal', date:'2026.05.08',
-    title:'전문가 자문료 지원 안내',
-    summary:'자문료 사전신청 필수 - 서면 1회 10만원, 대면 최대 30만원',
-    content:`연구분야 전문가 자문료를 지원합니다. <strong>사전신청 필수</strong>입니다.
-
-<span class="highlight"><strong>자문료 기준</strong>
-서면자문 (E-mail, 우편 등): 1회당 10만원
-
-대면자문 - 단독자문
- · 최초 1시간 이상: 10만원 / 초과 매시간 10만원, 최대 30만원
-
-대면자문 - 회의자문
- · 최초 1시간 이상: 10만원 / 2시간 초과 시 최대 15만원</span>
-
-<span class="warn">⚠ 자문료는 정량평가 항목입니다. 반드시 사전신청 후 진행하세요.</span>`
-  },
-];
-
-const GROUPS = [
-  {id:'g1',num:1,color:'#1565C0',name:'외.체.능',task:'AI 기술을 활용한 외국인 체납자 추적 효율화',desc:'AI 기술을 활용하여 외국인 체납자를 효율적으로 추적하고, 지방세 세외수입 체납 징수율을 높이기 위한 정책 방안을 연구합니다.'},
-  {id:'g2',num:2,color:'#1B5E20',name:'다해드림',task:'보조금 신청 웹서비스 개발 / OCR·LLM을 통한 보조금 정산 자동화',desc:'OCR 및 LLM 기술을 활용하여 보조금 신청 및 정산 업무를 자동화하는 웹서비스 개발 방안을 연구합니다.'},
-  {id:'g3',num:3,color:'#4A148C',name:'포레스트 링크',task:'원클릭 산지관리 통합 플랫폼 구축 및 데이터 행정 혁신 방안',desc:'산지관리 관련 데이터를 통합하여 원클릭으로 업무 처리가 가능한 플랫폼 구축 방안 및 데이터 기반 행정혁신을 연구합니다.'},
-  {id:'g4',num:4,color:'#B71C1C',name:'AI 데이터 풀버젼',task:'IoT 기반, 스마트 급경사지 시스템 도입검토',desc:'IoT 센서와 AI 데이터 분석을 결합하여 급경사지 안전사고를 예방하는 스마트 모니터링 시스템 도입 방안을 연구합니다.'},
-  {id:'g5',num:5,color:'#01579B',name:'화성 넥서스',task:'온톨로지 기반의 데이터 기반 정책 결정 모델 연구',desc:'온톨로지 기술을 활용하여 데이터 간 연계성을 구조화하고, 이를 기반으로 한 과학적 정책 결정 모델을 연구합니다.'},
-  {id:'g6',num:6,color:'#E65100',name:'경대생',task:'AI·센서 기반 개인형 이동장치(PM) 보행자 안전관리 정책 연구',desc:'전동킥보드 등 PM 기기의 급증에 따른 보행자 안전 문제를 AI와 센서 기술로 해결하는 정책 방안을 연구합니다.'},
-  {id:'g7',num:7,color:'#1B5E20',name:'BIOMASS',task:'AI·DATA 기반 가축전염병 대응 바이오매스 자원화 정책 연구',desc:'가축전염병 발생 시 살처분 바이오매스의 자원화를 AI·데이터 기반으로 체계화하는 정책 방안을 연구합니다.'},
-];
-
-// ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
 let NOTICES = [];
@@ -1029,9 +920,10 @@ let currentFilter = 'all';
 let searchQuery   = '';
 let noticePage    = 1;
 const PER_PAGE    = 10;
+const _loadError  = { notices: false, teams: false };
 
 // ═══════════════════════════════════════════════
-// API FETCH (with static fallback)
+// API FETCH
 // ═══════════════════════════════════════════════
 function formatDate(str) {
   if (!str) return '';
@@ -1049,7 +941,7 @@ async function loadNotices() {
     clearTimeout(timeout);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) return STATIC_NOTICES;
+    if (!Array.isArray(data)) return [];
     return data.map(n => ({
       id:      n.id,
       type:    n.category === '중요' ? 'important' : n.category === '신규' ? 'new' : 'normal',
@@ -1058,10 +950,10 @@ async function loadNotices() {
       summary: (n.content || '').replace(/<[^>]+>/g, '').slice(0, 60) + '…',
       content: n.content || '',
     }));
-  } catch (e) {
+  } catch {
     clearTimeout(timeout);
-    console.info('[notices] 백엔드 미연결 — 정적 데이터 사용');
-    return STATIC_NOTICES;
+    _loadError.notices = true;
+    return [];
   }
 }
 
@@ -1105,7 +997,11 @@ function renderNotices() {
   }
 
   if (!total) {
-    el.innerHTML = `<div class="no-results">🔍 검색 결과가 없습니다.</div>`;
+    el.innerHTML = _loadError.notices
+      ? `<div class="no-results">🔌 서버에 연결할 수 없습니다. 잠시 후 새로고침 해주세요.</div>`
+      : searchQuery
+        ? `<div class="no-results">🔍 검색 결과가 없습니다.</div>`
+        : `<div class="no-results">등록된 공지사항이 없습니다.</div>`;
     return;
   }
 
@@ -1254,24 +1150,15 @@ async function loadTeams() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) throw new Error('empty');
-    // Supabase teams 테이블에 task/color/desc 컬럼이 없을 수 있으므로 정적 데이터로 보완
-    return data.map(t => {
-      const g = GROUPS.find(x => x.num === t.order_num || x.id === t.id);
-      return {
-        ...t,
-        task:  t.task  || (g && g.task)  || '',
-        color: t.color || (g && g.color) || '#1565C0',
-        desc:  t.desc  || (g && g.desc)  || '',
-      };
-    });
+    return data.map(t => ({
+      ...t,
+      color: t.color || '#1565C0',
+      desc:  t.desc  || '',
+    }));
   } catch {
     clearTimeout(timeout);
-    // API 없으면 GROUPS 정적 데이터를 팀 포맷으로 변환
-    return GROUPS.map(g => ({
-      id: g.id, order_num: g.num, color: g.color,
-      name: g.name, task: g.task, desc: g.desc,
-      activities: [], total_used: 0, balance: BUDGET_TOTAL,
-    }));
+    _loadError.teams = true;
+    return [];
   }
 }
 
@@ -1369,10 +1256,12 @@ function renderTeamCard(t) {
 }
 
 function renderGroups(teams) {
-  document.getElementById('group-list').innerHTML = (teams || GROUPS.map(g => ({
-    id:g.id,order_num:g.num,color:g.color,name:g.name,task:g.task,desc:g.desc,
-    activities:[],total_used:0,balance:BUDGET_TOTAL,
-  }))).map(renderTeamCard).join('');
+  const el = document.getElementById('group-list');
+  if (!teams || teams.length === 0) {
+    el.innerHTML = `<div class="no-results">${_loadError.teams ? '🔌 서버에 연결할 수 없습니다. 잠시 후 새로고침 해주세요.' : '등록된 모임이 없습니다.'}</div>`;
+    return;
+  }
+  el.innerHTML = teams.map(renderTeamCard).join('');
 }
 
 function toggleGroup(id) {
