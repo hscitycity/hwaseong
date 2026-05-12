@@ -245,6 +245,21 @@ tr:hover td{background:rgba(79,142,247,0.04);}
 }
 .sp-delay-row .sp-confirm:hover{background:rgba(245,158,11,0.25);}
 
+/* ── SUB MINI (inline table) ── */
+.sub-mini-wrap{display:flex;gap:4px;flex-wrap:wrap;}
+.sub-mini{
+  display:inline-flex;flex-direction:column;align-items:center;
+  padding:4px 7px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--border);font-size:11px;font-weight:600;
+  user-select:none;transition:all .12s;min-width:42px;line-height:1.35;
+  white-space:nowrap;
+}
+.sub-mini span{display:block;font-size:10px;font-weight:400;}
+.sub-mini.s-none{background:rgba(138,165,200,0.06);color:var(--muted);}
+.sub-mini.s-delay{background:rgba(245,158,11,0.12);color:var(--gold);border-color:rgba(245,158,11,0.3);}
+.sub-mini.s-done{background:rgba(34,197,94,0.12);color:var(--success);border-color:rgba(34,197,94,0.3);}
+.sub-mini:hover{border-color:var(--accent);}
+
 /* ── DATE PARTS ── */
 .date-parts{display:flex;align-items:center;gap:4px;}
 .date-parts input{
@@ -447,13 +462,14 @@ tr:hover td{background:rgba(79,142,247,0.04);}
             <thead>
               <tr>
                 <th style="width:40px">번호</th>
-                <th style="width:120px">모임명</th>
+                <th style="width:110px">모임명</th>
                 <th>연구과제</th>
-                <th style="width:90px">관리</th>
+                <th>월별 제출현황</th>
+                <th style="width:70px">관리</th>
               </tr>
             </thead>
             <tbody id="team-tbody">
-              <tr class="empty-row"><td colspan="4">로딩 중...</td></tr>
+              <tr class="empty-row"><td colspan="5">로딩 중...</td></tr>
             </tbody>
           </table>
         </div>
@@ -781,10 +797,35 @@ async function deleteNotice(id) {
 // ═══════════════════════════
 // 모임 정보 관리
 // ═══════════════════════════
+function renderSubMini(t) {
+  const subs = (typeof t.card_submissions === 'string')
+    ? JSON.parse(t.card_submissions || '{}')
+    : (t.card_submissions || {});
+  return '<div class="sub-mini-wrap">' + SUB_ITEMS.map(({key, label}) => {
+    const state = subs[key] || '';
+    const {text, cls} = subStateDisplay(state);
+    return `<div class="sub-mini ${cls}" data-key="${key}" data-state="${state}" data-team-id="${t.id}" onclick="openSubPicker(this)">${label}<span>${text}</span></div>`;
+  }).join('') + '</div>';
+}
+
+async function autoSaveTeamSub(teamId) {
+  const t = _teams.find(x => x.id === teamId);
+  if (!t) return;
+  const card_submissions = {};
+  document.querySelectorAll(`.sub-mini[data-team-id="${teamId}"]`).forEach(el => {
+    if (el.dataset.state) card_submissions[el.dataset.key] = el.dataset.state;
+  });
+  t.card_submissions = card_submissions;
+  try {
+    await apiFetch(`/api/teams/${teamId}`, 'PUT', { card_submissions });
+    toast('저장됐습니다.');
+  } catch(e) { toast('저장 실패: ' + e.message, 'err'); }
+}
+
 function renderTeamManageTable() {
   const tbody = document.getElementById('team-tbody');
   if (!_teams.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">팀 데이터가 없습니다.</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">팀 데이터가 없습니다.</td></tr>';
     return;
   }
   tbody.innerHTML = _teams.map(t => `
@@ -792,6 +833,7 @@ function renderTeamManageTable() {
       <td>${t.order_num || t.id}</td>
       <td><strong>${t.name}</strong></td>
       <td style="white-space:normal">${t.task || '—'}</td>
+      <td>${renderSubMini(t)}</td>
       <td><button class="btn btn-sm btn-edit" onclick="startEditTeam(${t.id})">수정</button></td>
     </tr>
   `).join('');
@@ -838,8 +880,11 @@ function setSubState(state) {
   if (!_subPickerTarget) return;
   _subPickerTarget.dataset.state = state;
   const {text, cls} = subStateDisplay(state);
-  _subPickerTarget.className = 'sub-toggle-box ' + cls;
+  const baseClass = _subPickerTarget.classList.contains('sub-mini') ? 'sub-mini' : 'sub-toggle-box';
+  _subPickerTarget.className = baseClass + ' ' + cls;
   _subPickerTarget.querySelector('span').textContent = text;
+  const teamId = parseInt(_subPickerTarget.dataset.teamId);
+  if (teamId) autoSaveTeamSub(teamId);
   closeSubPicker();
 }
 
@@ -852,7 +897,9 @@ function confirmDelay() {
 document.addEventListener('click', function(e) {
   const picker = document.getElementById('sub-picker');
   if (!picker || !picker.classList.contains('open')) return;
-  if (!picker.contains(e.target) && !e.target.classList.contains('sub-toggle-box')) {
+  if (!picker.contains(e.target) &&
+      !e.target.classList.contains('sub-toggle-box') &&
+      !e.target.classList.contains('sub-mini')) {
     closeSubPicker();
   }
 });
