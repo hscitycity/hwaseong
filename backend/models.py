@@ -31,3 +31,5 @@ class ActivityUpdate(BaseModel):
 class TeamUpdate(BaseModel):
     name: Optional[str] = None
     task: Optional[str] = None
+    card_status: Optional[str] = None
+    card_submissions: Optional[dict] = None

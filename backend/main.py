@@ -111,3 +111,18 @@ def delete_activity(activity_id: int, x_admin_key: str = Header(None)):
     check_admin(x_admin_key)
     supabase.table("activities").delete().eq("id", activity_id).execute()
     return {"message": "삭제 완료"}
+
+# ─────────────────────────────────────────
+# 사이트 설정 API
+# ─────────────────────────────────────────
+
+@app.get("/api/settings")
+def get_settings():
+    res = supabase.table("settings").select("*").execute()
+    return {row["key"]: row["value"] for row in (res.data or [])}
+
+@app.put("/api/settings/{key}")
+def update_setting(key: str, body: dict, x_admin_key: str = Header(None)):
+    check_admin(x_admin_key)
+    supabase.table("settings").upsert({"key": key, "value": body.get("value", "")}).execute()
+    return {"message": "저장 완료"}
