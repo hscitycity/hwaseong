@@ -296,12 +296,11 @@ mark{background:rgba(245,158,11,0.25);color:var(--gold-light);border-radius:2px;
 .notice-item.open .notice-arrow{transform:rotate(180deg);}
 .notice-body{
   max-height:0;overflow:hidden;
-  transition:max-height .35s cubic-bezier(.4,0,.2,1);
+  transition:max-height .4s cubic-bezier(.4,0,.2,1), border-top-width .3s;
   background:#020C20;
   border-top:0 solid rgba(33,150,243,0.15);
 }
 .notice-body.open{
-  max-height:700px;
   border-top-width:1px;
 }
 .notice-body-inner{padding:1.25rem 1.5rem 1.5rem;}
@@ -1156,6 +1155,15 @@ function clearSearch() {
 // ═══════════════════════════════════════════════
 let _openNoticeId = null;
 
+function _openBody(body) {
+  body.classList.add('open');
+  body.style.maxHeight = body.scrollHeight + 'px';
+}
+function _closeBody(body) {
+  body.style.maxHeight = '0';
+  body.classList.remove('open');
+}
+
 function toggleNotice(id) {
   const item = document.getElementById('ni-' + id);
   const body = document.getElementById('nb-' + id);
@@ -1168,11 +1176,11 @@ function toggleNotice(id) {
     const prevItem = document.getElementById('ni-' + _openNoticeId);
     const prevBody = document.getElementById('nb-' + _openNoticeId);
     if (prevItem) prevItem.classList.remove('open');
-    if (prevBody) prevBody.classList.remove('open');
+    if (prevBody) _closeBody(prevBody);
   }
 
   item.classList.toggle('open', !isOpen);
-  body.classList.toggle('open', !isOpen);
+  isOpen ? _closeBody(body) : _openBody(body);
   _openNoticeId = isOpen ? null : id;
   _syncNoticeToggleBtn();
 }
@@ -1182,9 +1190,9 @@ function toggleAllNotices() {
   const items  = document.querySelectorAll('.notice-item[id^="ni-"]');
   const anyOpen = [...bodies].some(b => b.classList.contains('open'));
 
-  bodies.forEach(b  => b.classList.toggle('open',  !anyOpen));
-  items.forEach(it  => it.classList.toggle('open',  !anyOpen));
-  _openNoticeId = anyOpen ? null : -1; // -1 = 전체 열림 상태 표시용
+  bodies.forEach(b  => anyOpen ? _closeBody(b) : _openBody(b));
+  items.forEach(it  => it.classList.toggle('open', !anyOpen));
+  _openNoticeId = anyOpen ? null : -1;
   _syncNoticeToggleBtn();
 }
 
