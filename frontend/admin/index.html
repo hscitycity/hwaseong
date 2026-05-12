@@ -201,6 +201,50 @@ tr:hover td{background:rgba(79,142,247,0.04);}
 }
 .empty-row td{text-align:center;color:var(--muted);padding:2rem;}
 
+/* ── SUBMISSION TOGGLE BOXES ── */
+.sub-toggle-box{
+  padding:8px 12px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);text-align:center;
+  font-size:12px;font-weight:600;user-select:none;
+  transition:all .15s;min-width:72px;line-height:1.5;
+}
+.sub-toggle-box span{display:block;font-size:11px;font-weight:400;}
+.sub-toggle-box.s-none{background:rgba(138,165,200,0.08);color:var(--muted);}
+.sub-toggle-box.s-delay{background:rgba(245,158,11,0.15);color:var(--gold);border-color:rgba(245,158,11,0.35);}
+.sub-toggle-box.s-done{background:rgba(34,197,94,0.15);color:var(--success);border-color:rgba(34,197,94,0.35);}
+.sub-toggle-box:hover{border-color:var(--accent);}
+
+/* ── SUB PICKER POPUP ── */
+#sub-picker{
+  position:fixed;z-index:700;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:10px;box-shadow:0 8px 30px rgba(0,0,0,0.55);
+  display:none;flex-direction:column;gap:6px;min-width:170px;
+}
+#sub-picker.open{display:flex;}
+.sp-opt{
+  padding:8px 12px;border:1px solid var(--border);border-radius:7px;
+  background:var(--surface2);color:var(--text);font-size:13px;font-weight:600;
+  cursor:pointer;text-align:left;transition:all .15s;font-family:inherit;
+}
+.sp-opt:hover{border-color:var(--accent);color:var(--accent2);}
+.sp-opt.done{background:rgba(34,197,94,0.1);color:var(--success);border-color:rgba(34,197,94,0.3);}
+.sp-opt.done:hover{background:rgba(34,197,94,0.2);}
+.sp-delay-row{display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);}
+.sp-delay-row span{font-size:13px;font-weight:600;color:var(--gold);}
+.sp-delay-row input{
+  width:46px;padding:4px 6px;border:1px solid var(--border);border-radius:5px;
+  background:var(--bg);color:var(--text);font-size:13px;text-align:center;outline:none;
+}
+.sp-delay-row input:focus{border-color:var(--gold);}
+.sp-delay-row .sp-unit{font-size:12px;color:var(--muted);font-weight:400;}
+.sp-delay-row .sp-confirm{
+  padding:3px 9px;border:1px solid rgba(245,158,11,0.35);border-radius:5px;
+  background:rgba(245,158,11,0.12);color:var(--gold);font-size:12px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .15s;margin-left:auto;
+}
+.sp-delay-row .sp-confirm:hover{background:rgba(245,158,11,0.25);}
+
 /* ── DATE PARTS ── */
 .date-parts{display:flex;align-items:center;gap:4px;}
 .date-parts input{
@@ -241,6 +285,7 @@ tr:hover td{background:rgba(79,142,247,0.04);}
       <button class="tab-btn active" onclick="switchTab('notices',this)">📋 공지사항 관리</button>
       <button class="tab-btn" onclick="switchTab('activities',this)">📊 연구모임 활동 관리</button>
       <button class="tab-btn" onclick="switchTab('teams',this)">🏷️ 모임 정보 관리</button>
+      <button class="tab-btn" onclick="switchTab('content',this)">📅 사이드바 콘텐츠</button>
     </div>
 
     <!-- ── TAB 1: 공지사항 ── -->
@@ -415,6 +460,30 @@ tr:hover td{background:rgba(79,142,247,0.04);}
       </div>
     </div>
 
+    <!-- ── TAB 4: 사이드바 콘텐츠 ── -->
+    <div id="tab-content" style="display:none">
+
+      <!-- 활동관리카드 제출 일정 -->
+      <div class="card">
+        <div class="card-title">📅 활동관리카드 제출 일정표</div>
+        <div id="sched-rows"></div>
+        <button class="btn btn-sm btn-edit" style="margin-top:.75rem" onclick="addSchedRow()">+ 행 추가</button>
+        <div class="form-actions" style="margin-top:1rem">
+          <button class="btn btn-primary" onclick="saveSchedule()">저장</button>
+        </div>
+      </div>
+
+      <!-- 주요 일정 -->
+      <div class="card">
+        <div class="card-title">🗓️ 주요 일정 (타임라인)</div>
+        <div id="timeline-rows"></div>
+        <button class="btn btn-sm btn-edit" style="margin-top:.75rem" onclick="addTimelineRow()">+ 항목 추가</button>
+        <div class="form-actions" style="margin-top:1rem">
+          <button class="btn btn-primary" onclick="saveTimeline()">저장</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -471,10 +540,30 @@ tr:hover td{background:rgba(79,142,247,0.04);}
         <textarea id="tm-task" rows="3" placeholder="연구과제 제목"></textarea>
       </div>
     </div>
+    <div class="form-grid full" style="margin-top:1rem">
+      <div class="form-group">
+        <label>월별 활동관리카드 제출 현황</label>
+        <div id="tm-subs-grid" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"></div>
+      </div>
+    </div>
     <div class="form-actions" style="margin-top:1rem">
       <button class="btn btn-cancel" onclick="closeTeamModal()">취소</button>
       <button class="btn btn-primary" onclick="saveTeam()">저장</button>
     </div>
+  </div>
+</div>
+
+<!-- SUB PICKER -->
+<div id="sub-picker">
+  <button class="sp-opt" onclick="setSubState('')">— 미제출</button>
+  <button class="sp-opt done" onclick="setSubState('완료')">✔ 제출완료</button>
+  <div class="sp-delay-row">
+    <span>⏱ 지연</span>
+    <input type="text" id="sub-delay-days" maxlength="3" placeholder="0" inputmode="numeric"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+      onkeydown="if(event.key==='Enter')confirmDelay()"/>
+    <span class="sp-unit">일</span>
+    <button class="sp-confirm" onclick="confirmDelay()">확인</button>
   </div>
 </div>
 
@@ -539,7 +628,9 @@ function switchTab(name, btn) {
   document.getElementById('tab-notices').style.display    = name === 'notices'    ? '' : 'none';
   document.getElementById('tab-activities').style.display = name === 'activities' ? '' : 'none';
   document.getElementById('tab-teams').style.display      = name === 'teams'      ? '' : 'none';
-  if (name === 'teams') renderTeamManageTable();
+  document.getElementById('tab-content').style.display    = name === 'content'    ? '' : 'none';
+  if (name === 'teams')   renderTeamManageTable();
+  if (name === 'content') loadContentTab();
 }
 
 // ─── API HELPERS ───
@@ -706,12 +797,81 @@ function renderTeamManageTable() {
   `).join('');
 }
 
+const SUB_ITEMS = [
+  {key:'4',      label:'4월'},
+  {key:'5',      label:'5월'},
+  {key:'6',      label:'6월'},
+  {key:'7',      label:'7월'},
+  {key:'report', label:'결과보고서'},
+  {key:'ppt',    label:'발표PPT'},
+];
+
+function subStateDisplay(state) {
+  if (state === '완료') return {text:'제출완료', cls:'s-done'};
+  if (state && state.startsWith('지연:')) return {text:`지연(${state.split(':')[1]}일)`, cls:'s-delay'};
+  return {text:'미제출', cls:'s-none'};
+}
+
+let _subPickerTarget = null;
+
+function openSubPicker(el) {
+  const picker = document.getElementById('sub-picker');
+  if (_subPickerTarget === el && picker.classList.contains('open')) {
+    closeSubPicker(); return;
+  }
+  _subPickerTarget = el;
+  const state = el.dataset.state || '';
+  document.getElementById('sub-delay-days').value =
+    state.startsWith('지연:') ? state.split(':')[1] : '';
+  const rect = el.getBoundingClientRect();
+  picker.style.left = Math.min(rect.left, window.innerWidth - 185) + 'px';
+  picker.style.top  = (rect.bottom + 6) + 'px';
+  picker.classList.add('open');
+}
+
+function closeSubPicker() {
+  document.getElementById('sub-picker').classList.remove('open');
+  _subPickerTarget = null;
+}
+
+function setSubState(state) {
+  if (!_subPickerTarget) return;
+  _subPickerTarget.dataset.state = state;
+  const {text, cls} = subStateDisplay(state);
+  _subPickerTarget.className = 'sub-toggle-box ' + cls;
+  _subPickerTarget.querySelector('span').textContent = text;
+  closeSubPicker();
+}
+
+function confirmDelay() {
+  const days = parseInt(document.getElementById('sub-delay-days').value) || 0;
+  if (!days) { document.getElementById('sub-delay-days').focus(); return; }
+  setSubState('지연:' + days);
+}
+
+document.addEventListener('click', function(e) {
+  const picker = document.getElementById('sub-picker');
+  if (!picker || !picker.classList.contains('open')) return;
+  if (!picker.contains(e.target) && !e.target.classList.contains('sub-toggle-box')) {
+    closeSubPicker();
+  }
+});
+
 function startEditTeam(id) {
   const t = _teams.find(x => x.id === id);
   if (!t) return;
-  document.getElementById('tm-id').value    = id;
-  document.getElementById('tm-name').value  = t.name  || '';
-  document.getElementById('tm-task').value  = t.task  || '';
+  document.getElementById('tm-id').value   = id;
+  document.getElementById('tm-name').value = t.name || '';
+  document.getElementById('tm-task').value = t.task || '';
+  const subs = (typeof t.card_submissions === 'string')
+    ? JSON.parse(t.card_submissions || '{}')
+    : (t.card_submissions || {});
+  const grid = document.getElementById('tm-subs-grid');
+  grid.innerHTML = SUB_ITEMS.map(({key, label}) => {
+    const state = subs[key] || '';
+    const {text, cls} = subStateDisplay(state);
+    return `<div class="sub-toggle-box ${cls}" data-key="${key}" data-state="${state}" onclick="openSubPicker(this)">${label}<span>${text}</span></div>`;
+  }).join('');
   document.getElementById('team-modal-overlay').style.display = 'flex';
 }
 
@@ -724,11 +884,14 @@ async function saveTeam() {
   const name = document.getElementById('tm-name').value.trim();
   const task = document.getElementById('tm-task').value.trim();
   if (!name) { toast('모임명을 입력하세요.', 'err'); return; }
+  const card_submissions = {};
+  document.querySelectorAll('#tm-subs-grid .sub-toggle-box').forEach(el => {
+    if (el.dataset.state) card_submissions[el.dataset.key] = el.dataset.state;
+  });
   try {
-    await apiFetch(`/api/teams/${id}`, 'PUT', { name, task });
-    // 로컬 캐시 업데이트
+    await apiFetch(`/api/teams/${id}`, 'PUT', { name, task, card_submissions });
     const t = _teams.find(x => x.id === id);
-    if (t) { t.name = name; t.task = task; }
+    if (t) { t.name = name; t.task = task; t.card_submissions = card_submissions; }
     toast('모임 정보가 수정됐습니다.');
     closeTeamModal();
     renderTeamManageTable();
@@ -862,6 +1025,101 @@ async function deleteActivity(id) {
     toast('삭제됐습니다.');
     loadActivities();
   } catch(e) { toast('삭제 실패: ' + e.message, 'err'); }
+}
+// ═══════════════════════════
+// 사이드바 콘텐츠 관리
+// ═══════════════════════════
+const SCHED_DEFAULT = [
+  {month:'4월', deadline:'~ 5. 8.(금)', status:'완료'},
+  {month:'5월', deadline:'~ 6. 5.(목)', status:'진행중'},
+  {month:'6월', deadline:'~ 7. 3.(금)', status:''},
+  {month:'7월', deadline:'~ 8. 7.(금)', status:''},
+  {month:'8월', deadline:'결과보고서',  status:''},
+];
+const TL_DEFAULT = [
+  {date:'~ 2026. 4~8월',     label:'월 1회 이상 연구활동',          done:true},
+  {date:'~ 2026. 9. 11.(금)',label:'결과보고서 제출',               done:false},
+  {date:'~ 2026. 9. 18.(금)',label:'PPT 발표자료 제출',             done:false},
+  {date:'2026. 9월',         label:'1차 평가 (서면 70% + 정량 30%)',done:false},
+  {date:'2026. 9~10월',      label:'2차 평가 (PPT 발표, 7분)',      done:false},
+  {date:'2026. 10~12월',     label:'우수팀 국내 선진지 벤치마킹',    done:false},
+];
+
+let _schedRows    = [];
+let _timelineRows = [];
+
+async function loadContentTab() {
+  try {
+    const s = await apiFetch('/api/settings');
+    _schedRows    = s.schedule    ? JSON.parse(s.schedule)    : [...SCHED_DEFAULT];
+    _timelineRows = s.timeline    ? JSON.parse(s.timeline)    : [...TL_DEFAULT];
+  } catch {
+    _schedRows    = [...SCHED_DEFAULT];
+    _timelineRows = [...TL_DEFAULT];
+  }
+  renderSchedRows();
+  renderTimelineRows();
+}
+
+function renderSchedRows() {
+  document.getElementById('sched-rows').innerHTML = _schedRows.map((r,i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <input type="text" value="${r.month}" placeholder="월" style="width:60px"
+        oninput="_schedRows[${i}].month=this.value"/>
+      <input type="text" value="${r.deadline}" placeholder="제출기한" style="width:130px"
+        oninput="_schedRows[${i}].deadline=this.value"/>
+      <select onchange="_schedRows[${i}].status=this.value" style="width:90px">
+        <option value="" ${!r.status?'selected':''}>—</option>
+        <option value="진행중" ${r.status==='진행중'?'selected':''}>진행중</option>
+        <option value="완료"   ${r.status==='완료'?'selected':''}>완료</option>
+      </select>
+      <button class="btn btn-sm btn-del" onclick="removeSchedRow(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addSchedRow() {
+  _schedRows.push({month:'', deadline:'', status:''});
+  renderSchedRows();
+}
+function removeSchedRow(i) {
+  _schedRows.splice(i,1);
+  renderSchedRows();
+}
+async function saveSchedule() {
+  try {
+    await apiFetch('/api/settings/schedule','PUT',{value: JSON.stringify(_schedRows)});
+    toast('제출 일정이 저장됐습니다.');
+  } catch(e) { toast('저장 실패: ' + e.message,'err'); }
+}
+
+function renderTimelineRows() {
+  document.getElementById('timeline-rows').innerHTML = _timelineRows.map((r,i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+      <input type="text" value="${r.date}" placeholder="날짜" style="width:160px"
+        oninput="_timelineRows[${i}].date=this.value"/>
+      <input type="text" value="${r.label}" placeholder="내용" style="flex:1;min-width:180px"
+        oninput="_timelineRows[${i}].label=this.value"/>
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap">
+        <input type="checkbox" ${r.done?'checked':''} onchange="_timelineRows[${i}].done=this.checked"
+          style="accent-color:var(--accent)"/> 완료
+      </label>
+      <button class="btn btn-sm btn-del" onclick="removeTimelineRow(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addTimelineRow() {
+  _timelineRows.push({date:'', label:'', done:false});
+  renderTimelineRows();
+}
+function removeTimelineRow(i) {
+  _timelineRows.splice(i,1);
+  renderTimelineRows();
+}
+async function saveTimeline() {
+  try {
+    await apiFetch('/api/settings/timeline','PUT',{value: JSON.stringify(_timelineRows)});
+    toast('주요 일정이 저장됐습니다.');
+  } catch(e) { toast('저장 실패: ' + e.message,'err'); }
 }
 </script>
 </body>

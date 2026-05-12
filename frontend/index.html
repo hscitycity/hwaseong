@@ -364,6 +364,28 @@ mark{background:rgba(245,158,11,0.25);color:var(--gold-light);border-radius:2px;
 }
 .gc-name{font-size:15px;font-weight:700;color:#E8F4FD;margin-bottom:3px;line-height:1.4;}
 .gc-task{font-size:13px;color:var(--text-muted);line-height:1.5;}
+.gc-status{
+  font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px;
+  flex-shrink:0;margin-top:3px;white-space:nowrap;
+}
+.gc-status.done{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3);}
+.gc-status.prog{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);}
+.gc-status.none{background:rgba(138,165,200,0.1);color:var(--text-muted);border:1px solid rgba(138,165,200,0.2);}
+
+/* ── MONTHLY SUBMISSION GRID ── */
+.card-sub-wrap{margin-bottom:.875rem;}
+.card-sub-title{font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:.5rem;letter-spacing:.05em;}
+.card-sub-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.cs-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:rgba(5,18,45,0.6);border:1px solid rgba(33,150,243,0.15);
+  border-radius:8px;padding:7px 12px;min-width:52px;
+}
+.cs-month{font-size:11px;color:var(--text-muted);font-weight:600;}
+.cs-badge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:100px;white-space:nowrap;}
+.cs-badge.done{background:rgba(34,197,94,0.15);color:#4ade80;}
+.cs-badge.prog{background:rgba(245,158,11,0.15);color:#fbbf24;}
+.cs-badge.none{background:rgba(138,165,200,0.08);color:rgba(138,165,200,0.5);}
 .gc-toggle{
   margin-left:auto;font-size:18px;color:var(--text-muted);flex-shrink:0;
   transition:transform .3s cubic-bezier(.4,0,.2,1);
@@ -659,7 +681,7 @@ footer{
           </div>
           <div class="tl-item done">
             <div class="tl-date">~ 2026. 9. 11.(금)</div>
-            <div class="tl-label">결과보고서 제출<span class="tl-badge">D-DAY 확인</span></div>
+            <div class="tl-label">결과보고서 제출<span class="tl-badge" id="dday-badge">D-?</span></div>
           </div>
           <div class="tl-item">
             <div class="tl-date">~ 2026. 9. 18.(금)</div>
@@ -1260,6 +1282,41 @@ function fmtMoney(n) {
   return Number(n || 0).toLocaleString('ko-KR') + '원';
 }
 
+function cardStatusBadge(s) {
+  if (s === '완료')  return `<span class="gc-status done">✔ 완료</span>`;
+  if (s === '진행중') return `<span class="gc-status prog">◐ 진행중</span>`;
+  return `<span class="gc-status none">— 미제출</span>`;
+}
+
+const SUBMISSION_MONTHS = [
+  {key:'4',      label:'4월'},
+  {key:'5',      label:'5월'},
+  {key:'6',      label:'6월'},
+  {key:'7',      label:'7월'},
+  {key:'report', label:'결과보고서'},
+  {key:'ppt',    label:'발표PPT'},
+];
+
+function renderCardSubmissions(subs) {
+  const data = (typeof subs === 'string') ? JSON.parse(subs || '{}') : (subs || {});
+  const items = SUBMISSION_MONTHS.map(({key, label}) => {
+    const s = data[key] || '';
+    let cls, text;
+    if (s === '완료') { cls = 'done'; text = '제출완료'; }
+    else if (s && s.startsWith('지연:')) { cls = 'prog'; text = `지연(${s.split(':')[1]}일)`; }
+    else if (s === '진행중') { cls = 'prog'; text = '진행중'; }
+    else { cls = 'none'; text = '미제출'; }
+    return `<div class="cs-item">
+      <span class="cs-month">${label}</span>
+      <span class="cs-badge ${cls}">${text}</span>
+    </div>`;
+  }).join('');
+  return `<div class="card-sub-wrap">
+    <div class="card-sub-title">활동관리카드 제출 현황</div>
+    <div class="card-sub-grid">${items}</div>
+  </div>`;
+}
+
 function renderTeamCard(t) {
   const used    = t.total_used || 0;
   const balance = t.balance    ?? (BUDGET_TOTAL - used);
@@ -1292,6 +1349,7 @@ function renderTeamCard(t) {
       </div>
       <div class="gc-body" id="body-${tid}">
         ${t.desc ? `<div class="gc-desc">${t.desc}</div>` : ''}
+        ${renderCardSubmissions(t.card_submissions)}
         <div class="gc-budget">
           <span class="gc-budget-label">활동비 사용현황</span>
           <div class="gc-budget-values">
@@ -1353,6 +1411,21 @@ function setNav(el) {
 }
 
 // ═══════════════════════════════════════════════
+// D-DAY
+// ═══════════════════════════════════════════════
+function updateDday() {
+  const el = document.getElementById('dday-badge');
+  if (!el) return;
+  const target = new Date('2026-09-11T00:00:00');
+  const today  = new Date();
+  today.setHours(0,0,0,0);
+  const diff = Math.round((target - today) / 86400000);
+  if (diff > 0)       el.textContent = `D-${diff}`;
+  else if (diff === 0) el.textContent = 'D-Day';
+  else                 el.textContent = `D+${Math.abs(diff)}`;
+}
+
+// ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
 async function init() {
@@ -1362,6 +1435,7 @@ async function init() {
   renderNotices();
   initTilt();
   observeCards();
+  updateDday();
 }
 
 init();
