@@ -933,9 +933,9 @@ function formatDate(str) {
   } catch { return str; }
 }
 
-async function loadNotices() {
+async function _fetchNotices() {
   const ctrl    = new AbortController();
-  const timeout = setTimeout(() => ctrl.abort(), 3500);
+  const timeout = setTimeout(() => ctrl.abort(), 15000);
   try {
     const res = await fetch('https://hwaseong-api.onrender.com/api/notices?t=' + Date.now(), { signal: ctrl.signal });
     clearTimeout(timeout);
@@ -952,8 +952,21 @@ async function loadNotices() {
     }));
   } catch {
     clearTimeout(timeout);
-    _loadError.notices = true;
-    return [];
+    throw new Error('failed');
+  }
+}
+
+async function loadNotices() {
+  try {
+    return await _fetchNotices();
+  } catch {
+    await new Promise(r => setTimeout(r, 2000));
+    try {
+      return await _fetchNotices();
+    } catch {
+      _loadError.notices = true;
+      return [];
+    }
   }
 }
 
@@ -1141,9 +1154,9 @@ function toggleAllGroups() {
 // ═══════════════════════════════════════════════
 const BUDGET_TOTAL = 300000;
 
-async function loadTeams() {
+async function _fetchTeams() {
   const ctrl    = new AbortController();
-  const timeout = setTimeout(() => ctrl.abort(), 3500);
+  const timeout = setTimeout(() => ctrl.abort(), 15000);
   try {
     const res = await fetch('https://hwaseong-api.onrender.com/api/teams?t=' + Date.now(), { signal: ctrl.signal });
     clearTimeout(timeout);
@@ -1157,8 +1170,21 @@ async function loadTeams() {
     }));
   } catch {
     clearTimeout(timeout);
-    _loadError.teams = true;
-    return [];
+    throw new Error('failed');
+  }
+}
+
+async function loadTeams() {
+  try {
+    return await _fetchTeams();
+  } catch {
+    await new Promise(r => setTimeout(r, 2000));
+    try {
+      return await _fetchTeams();
+    } catch {
+      _loadError.teams = true;
+      return [];
+    }
   }
 }
 
